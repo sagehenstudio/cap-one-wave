@@ -25,9 +25,9 @@ Capital one alert emails will include text that looks like the following. If you
 
 ```As requested, we’re notifying you that on {{date}}, at {{payee}}, a pending
 authorization or purchase in the amount of ${{amount}} was placed or charged on
-your Capital One® credit card account.
+your Capital One® credit card account.```
 
-Note: You’ll receive this notification for both purchases and pending
+```Note: You’ll receive this notification for both purchases and pending
 authorizations, such as car rentals, hotel reservations and gas purchases,
 even if an actual transaction hasn’t taken place.```
 
