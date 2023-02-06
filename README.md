@@ -23,13 +23,13 @@ Every Capital One Instant Purchase Notification will be formatted similarly, and
 
 Capital one alert emails will include text that looks like the following. If yours is different, you'll need to adjust the template based on the emails you get from Capital One. But for the most part, your email (and so your template) should look like this:
 
-```As requested, we’re notifying you that on {{date}}, at {{payee}}, a pending
+```As requested, we're notifying you that on {{date}}, at {{payee}}, a pending
 authorization or purchase in the amount of ${{amount}} was placed or charged on
 your Capital One® credit card account.```
 
-```Note: You’ll receive this notification for both purchases and pending
+```Note: You'll receive this notification for both purchases and pending
 authorizations, such as car rentals, hotel reservations and gas purchases,
-even if an actual transaction hasn’t taken place.```
+even if an actual transaction hasn't taken place.```
 
 Cut and paste that to the "Inital Template" field. Leave the other Body Source and Parser Engine settings as they are, and click the blue "Save Address and Template" button. We've done a couple things here, but most importantly we've told the robot to look for a payment date {{date}}, a payee {{payee}} and an {{amount}}, which we will need to set up our Wave transaction later.
 
