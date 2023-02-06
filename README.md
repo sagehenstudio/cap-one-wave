@@ -59,7 +59,7 @@ Install the Cap One to Wave plugin (this code) for your Wordpress site.  Once th
 ### Step 6
 Back to the Zap. Add a second action - the "Webhooks by Zapier" type. The action event is "POST." The URL is your webhook URL from step 4a. Payload type is JSON. Complete the rest of the settings to look like this:
 
-![Webhook settings](https://little-package.com/wp-content/uploads/2021/02/zapier-wave-capital-one-webhook-settings-400x300.png)
+![Webhook settings](https://little-package.com/wp-content/uploads/2021/02/zapier-wave-capital-one-webhook-settings.png)
 
 A simple Zap with only two actions: easy and done! It should be ready now, and a test of the Zap should send a transaction to Wave.
 
