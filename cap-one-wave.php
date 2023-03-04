@@ -89,7 +89,13 @@ if ( ! class_exists( 'Cap_One_Wave' ) ) :
 			return $links;
 
 		}
-		
+
+		/**
+		 * Get current plugin settings
+		 *
+		 * @param void
+		 * @return array
+		 */		
 		public function get_settings() {
 
 			$settings = array();
@@ -100,13 +106,6 @@ if ( ! class_exists( 'Cap_One_Wave' ) ) :
 			$settings['liability'] = isset( $cow_settings['liability'] ) ? $cow_settings['liability'] : 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx';
 			$settings['expense'] = isset( $cow_settings['expense'] ) ? $cow_settings['expense'] : 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx';
 			$settings['headers'] = array(
-				/**
-				 *
-				 * Wave API full access token
-				 * You gotta set up a Wave API connection for this, check out:
-				 * https://developer.waveapps.com/hc/en-us/articles/360020948171#application
-				 *
-				 */
 				'Authorization' => 'Bearer ' . $settings['token'],
 				'Content-Type' => 'application/json',
 			);
@@ -119,7 +118,7 @@ if ( ! class_exists( 'Cap_One_Wave' ) ) :
 
 		}
 
-		/*
+		/**
 		 * Add settings to the WP Admin menu (under Settings)
 		 *
 		 * @param void
@@ -131,7 +130,7 @@ if ( ! class_exists( 'Cap_One_Wave' ) ) :
 
 		}
 
-		/*
+		/**
 		 * Creates our settings in the options table
 		 *
 		 * @param void
@@ -150,6 +149,10 @@ if ( ! class_exists( 'Cap_One_Wave' ) ) :
 
 		}
 
+		/**
+		 * Output a settings page
+		 *
+		 */
 		public function cap_one_settings_page() {
 
 			$settings = $this->get_settings();
@@ -176,7 +179,7 @@ if ( ! class_exists( 'Cap_One_Wave' ) ) :
 								<label for="cow_token"><?php esc_html_e( 'Wave Full Access Token', 'cap-one-wave' ); ?></label>
 							</th>
 							<td>
-								<input type="text" id="cow_token" name="cow_settings[token]" placeholder="<?php echo $settings['token']; ?>" value="<?php echo $settings['token']; ?>" class="widefat">
+								<input type="text" id="cow_token" name="cow_settings[token]" placeholder="<?php esc_attr_e( $settings['token'] ); ?>" value="<?php esc_attr_e( $settings['token'] ); ?>" class="widefat">
 								<p><?php echo sprintf( __( '<a href="%s" target="_blank" rel="noopener">You gotta set up a Wave API connection to get a token</a>.', 'cap-one-wave' ), 'https://developer.waveapps.com/hc/en-us/articles/360020948171#application' ); ?></p>
 							</td>
 						</tr>
@@ -185,7 +188,7 @@ if ( ! class_exists( 'Cap_One_Wave' ) ) :
 								<label for="cow_business"><?php esc_html_e( 'Wave Business ID', 'cap-one-wave' ); ?></label>
 							</th>
 							<td>
-								<input type="text" id="cow_business" name="cow_settings[biz_id]" placeholder="<?php echo $settings['biz_id']; ?>" value="<?php echo $settings['biz_id']; ?>" class="widefat">
+								<input type="text" id="cow_business" name="cow_settings[biz_id]" placeholder="<?php esc_attr_e( $settings['biz_id'] ); ?>" value="<?php echo $settings['biz_id']; ?>" class="widefat">
 								<p><?php echo sprintf( __( '<a href="%s" target="_blank" rel="noopener">How to find your business ID?</a>' , 'cap-one-wave' ), 'Learn more at: https://little-package.com/blog/2021/01/a-side-project/' ); ?></p>
 							</td>
 						</tr>
@@ -203,7 +206,7 @@ if ( ! class_exists( 'Cap_One_Wave' ) ) :
 								</select>
 								<p><?php echo __( '(We recommend this be your Capital One liability account)', 'cap-one-wave' ); ?></p>
 								<?php } else { ?>
-									<input type="text" id="cow_liab" name="cow_settings[liability]" placeholder="<?php echo $settings['liability']; ?>" value="<?php echo $settings['liability']; ?>" class="widefat">
+									<input type="text" id="cow_liab" name="cow_settings[liability]" placeholder="<?php esc_attr_e( $settings['liability'] ); ?>" value="<?php esc_attr_e( $settings['liability'] ); ?>" class="widefat">
 									<p><?php echo __( 'Once your token and business ID are entered correctly, a pulldown will show here with all liability accounts.' , 'cap-one-wave' ); ?></p>
 								<?php } ?>
 							</td>
@@ -222,7 +225,7 @@ if ( ! class_exists( 'Cap_One_Wave' ) ) :
 								</select>
 								<p><?php echo __( '(We recommend you use Uncategorized Expense unless you have another plan. A lot can be done here using plugin hooks...)', 'cap-one-wave' ); ?></p>
 								<?php } else { ?>
-									<input type="text" id="cow_expense" name="cow_settings[expense]" placeholder="<?php echo $settings['expense']; ?>" value="<?php echo $settings['expense']; ?>" class="widefat">
+									<input type="text" id="cow_expense" name="cow_settings[expense]" placeholder="<?php esc_attr_e( $settings['expense'] ); ?>" value="<?php esc_attr_e( $settings['expense'] ); ?>" class="widefat">
 									<p><?php echo __( 'Once your token and business ID are entered correctly, a pulldown will show here with all expense accounts.' , 'cap-one-wave' ); ?></p>
 								<?php } ?>
 							</td>
@@ -377,6 +380,12 @@ if ( ! class_exists( 'Cap_One_Wave' ) ) :
 
 		}
 
+		/**
+		 * Fetch business accounts from Wave
+		 *
+		 * @param string $type
+		 * @return void
+		 */
 		public function get_accounts( $type ) {
 
 			$settings = $this->get_settings();
@@ -393,8 +402,14 @@ if ( ! class_exists( 'Cap_One_Wave' ) ) :
 
 			$response = $this->wp_remote_post( $post );
 
-			if ( ! $response ) {
-                return false;
+			if ( is_wp_error( $response ) ) {
+				error_log( 'Cap One Wave: HTTP request error' . print_r( $response->get_error_message(), true) );
+				return false;
+			}
+
+			if ( 200 !== wp_remote_retrieve_response_code( $response ) ) {
+				error_log( 'Cap One Wave: HTTP status code was not 200' );
+				return false;
 			}
 
 			$response = json_decode( $response['body'], true );
@@ -419,7 +434,7 @@ if ( ! class_exists( 'Cap_One_Wave' ) ) :
 		 * The most important bit...
 		 * MAKE HTTP REQUEST TO WAVE
 		 *
-		*/
+		 */
 		private function wp_remote_post( $data ) {
 
 			$settings = $this->get_settings();
@@ -427,7 +442,7 @@ if ( ! class_exists( 'Cap_One_Wave' ) ) :
 
 			$response = wp_remote_post( 'https://gql.waveapps.com/graphql/public', array(
 					'method'      => 'POST',
-					'timeout'     => 45,
+					'timeout'     => 30,
 					'blocking'    => true,
 					'headers'     => $headers,
 					'body'        => $data,
@@ -493,20 +508,24 @@ if ( ! class_exists( 'Cap_One_Wave' ) ) :
 		 *
 		 * @return void 
 		 *
-		*/
+		 */
 		public function capital_one_to_wave( $new_status, $old_status, $post_obj ) {
 
-			if ( $new_status != 'private' && $old_status != 'new' ) return;
+			if ( $new_status != 'private' && $old_status != 'new' ) {
+				return;
+			}
 
-			if ( get_the_excerpt( $post_obj ) != 'new Capital One charge' ) return;
+			if ( get_the_excerpt( $post_obj ) != 'new Capital One charge' ) {
+				return;
+			}
 
 			$date = get_the_date( 'Y-m-d', $post_obj );
 
 			$data = array ( 
-				'post'		=> 'post:' . $post_obj->ID,
-				'date'		=> $date,
-				'amt'		=> $post_obj->post_content, // charge amt is held in WP post content
-				'payee'		=> $post_obj->post_title, // payee is held in WP post title
+				'post'	=> 'post:' . $post_obj->ID,
+				'date'	=> $date,
+				'amt'	=> $post_obj->post_content, // charge amt is held in WP post content
+				'payee'	=> $post_obj->post_title, // payee is held in WP post title
 			);
 
 			// error_log( 'data: ' . print_r( $data, true ) );
